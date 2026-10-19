@@ -12,6 +12,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
 	('share/' + package_name + '/launch', glob('launch/*.launch.py')),
+	('share/' + package_name + '/models', glob('models/*.sdf')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -27,6 +28,8 @@ setup(
     entry_points={
         'console_scripts': [
 		'draw_number = g05_prii3_move_turtlebot.draw_number:main',
+		'laser_filter = g05_prii3_move_turtlebot.laser_filter:main',
+		'evitar_colision = g05_prii3_move_turtlebot.evitar_colision:main',
         ],
     },
 )
