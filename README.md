@@ -1,8 +1,12 @@
 # Proyecto PRII 3 — Robots Inteligentes
 
-Workspace de ROS 2 del grupo 05. Contiene mi implementación del dibujo
-del número 0 en turtlesim y las actividades preparatorias con
-TurtleBot3, Gazebo y LIDAR.
+Workspace personal de ROS 2 para la asignatura Proyecto RII 3:
+Robots Inteligentes, grupo 05.
+
+Contiene el trabajo del Sprint 1, las actividades preparatorias con
+TurtleBot3, Gazebo y LIDAR, y el desarrollo progresivo del Sprint 2.
+
+Cada apartado indica sus instrucciones de ejecución y su estado.
 
 ## Autor
 
@@ -162,9 +166,11 @@ ros2 service call /reiniciar_cero std_srvs/srv/Empty "{}"
 El reinicio utiliza el servicio de reset de turtlesim para limpiar
 la ventana y comenzar nuevamente desde su posición inicial.
 
-## 6. Actividades preparatorias — TurtleBot3 y Gazebo
+## 6. Actividades preparatorias del Sprint 2 — TurtleBot3 y Gazebo
 
-Estas actividades son previas al siguiente sprint.
+Ejercicios de preparación completados y probados en simulación.
+Sirven como base para el Sprint 2, pero no cubren por sí solos
+todos sus requisitos.
 
 No ejecutar simultáneamente los nodos de dibujo, teleoperación y parada
 ante obstáculos: todos pueden publicar órdenes en `/cmd_vel`.
