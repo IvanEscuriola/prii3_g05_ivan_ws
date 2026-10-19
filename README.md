@@ -23,7 +23,7 @@ Ivan — Grupo 05
 
 ```zsh
 cd ~/Documents
-git clone [https://github.com/IvanEscuriola/g05_prii3_ws.git](https://github.com/IvanEscuriola/g05_prii3_ws.git) proy3
+git clone https://github.com/IvanEscuriola/prii3_g05_ivan_ws.git proy3
 cd proy3
 ```
 
