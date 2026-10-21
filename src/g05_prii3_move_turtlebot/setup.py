@@ -30,6 +30,7 @@ setup(
 		'draw_number = g05_prii3_move_turtlebot.draw_number:main',
 		'laser_filter = g05_prii3_move_turtlebot.laser_filter:main',
 		'evitar_colision = g05_prii3_move_turtlebot.evitar_colision:main',
+		'collision_avoidance = g05_prii3_move_turtlebot.collision_avoidance:main',
         ],
     },
 )
