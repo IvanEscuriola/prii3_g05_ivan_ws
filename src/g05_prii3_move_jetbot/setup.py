@@ -1,4 +1,5 @@
 from setuptools import find_packages, setup
+from glob import glob
 
 package_name = 'g05_prii3_move_jetbot'
 
@@ -10,6 +11,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+	('share/' + pcakage_name + '/launch', glob('launch/*.launch.py'),),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -24,6 +26,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+		'draw_number = g05_prii3_move_jetbot.draw_number:main',
         ],
     },
 )
