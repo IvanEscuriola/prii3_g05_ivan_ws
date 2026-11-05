@@ -4,8 +4,8 @@ Workspace personal de ROS 2 para la asignatura Proyecto RII 3,
 grupo 05.
 
 Incluye el trabajo de Sprint 1, las actividades preparatorias
-con TurtleBot3, Gazebo y LIDAR, y los comportamientos de simulación
-desarrollados para Sprint 2.
+con TurtleBot3, Gazebo y LIDAR, los comportamientos de simulación
+desarrollados para Sprint 2 y la implementación final en el Jetbot real.
 
 ## Estado actual
 
@@ -13,27 +13,30 @@ desarrollados para Sprint 2.
 - Simulación TurtleBot3: movimiento autónomo, parada ante obstáculos
   y esquiva de la caja de prueba.
 - Visión ArUco: detector experimental ejecutado desde el portátil.
-- Jetbot: pendiente de desarrollar y probar con el robot real.
+- Jetbot: dibujo del `0` implementado y probado en el robot real,
+  con ejecución mediante `launch`, servicios de control y parada
+  ante obstáculos mediante LIDAR.
 - Calibración y demostración de cámara/ArUco del equipo: consultar
   el material preparado por el compañero responsable.
 
 ## Entorno utilizado
 
 - Ubuntu 24.04 LTS.
-- ROS 2 Jazzy Jalisco.
+- ROS 2 Jazzy Jalisco en el portátil.
+- ROS 2 Foxy en el Jetbot.
 - Python 3.
-- Shell: zsh.
+- Shell: zsh en el portátil y bash en el Jetbot.
 - Gazebo Sim para las pruebas de TurtleBot3.
 
 > El enunciado del Sprint 1 indica Ubuntu 22.04 y ROS 2 Humble.
 > Este workspace se ha desarrollado y probado en Ubuntu 24.04
-> con ROS 2 Jazzy.
+> con ROS 2 Jazzy. La parte del Jetbot se ha probado con ROS 2 Foxy.
 
 ## Descargar el workspace
 
 ```zsh
 cd ~/Documents
-git clone https://github.com/IvanEscuriola/prii3_g05_ivan_ws.git proy3
+git clone [https://github.com/IvanEscuriola/prii3_g05_ivan_ws.git](https://github.com/IvanEscuriola/prii3_g05_ivan_ws.git) proy3
 cd proy3
 ```
 
@@ -122,6 +125,12 @@ src/
 │       ├── evitar_colision.py
 │       ├── collision_avoidance.py
 │       └── obstacle_avoidance.py
+│
+├── g05_prii3_move_jetbot/
+│   ├── launch/
+│   │   └── draw_number.launch.py
+│   └── g05_prii3_move_jetbot/
+│       └── draw_number.py
 │
 └── g05_prii3_vision/
     └── g05_prii3_vision/
@@ -326,6 +335,98 @@ entornos desconocidos ni como un sistema de seguridad para un robot real.
 | `/filtered_scan` | `sensor_msgs/msg/LaserScan` | Lecturas procesadas por `laser_filter` |
 | `/odom` | `nav_msgs/msg/Odometry` | Posición y velocidad estimadas |
 
+## Sprint 2 — Dibujo del 0 en Jetbot real
+
+Esta implementación se ha desarrollado y probado en el Jetbot real
+con ROS 2 Foxy. El robot dibuja un `0` mediante una secuencia de
+avances y giros controlados por velocidad y tiempo.
+
+### Ejecución en el Jetbot
+
+Conectarse al Jetbot por SSH y ejecutar:
+
+```bash
+cd ~/prii3_ivan_ws
+
+source /opt/ros/foxy/setup.bash
+source /home/jetbot/jetbot_ws/install/setup.bash
+source ~/prii3_ivan_ws/install/local_setup.bash
+
+ros2 launch g05_prii3_move_jetbot draw_number.launch.py
+```
+
+El launch inicia:
+
+- El controlador del Jetbot.
+- El filtro EKF.
+- El LIDAR RPLIDAR.
+- Las transformaciones necesarias.
+- El nodo `draw_number_jetbot`.
+
+El robot comienza pausado y no se mueve hasta recibir la orden
+de reanudación mediante el servicio correspondiente.
+
+### Servicios
+
+En otra terminal del Jetbot:
+
+```bash
+source /opt/ros/foxy/setup.bash
+source /home/jetbot/jetbot_ws/install/setup.bash
+source ~/prii3_ivan_ws/install/local_setup.bash
+```
+
+Reiniciar la secuencia:
+
+```bash
+ros2 service call /jetbot/reiniciar_dibujo std_srvs/srv/Empty "{}"
+```
+
+Reanudar:
+
+```bash
+ros2 service call /jetbot/pausar_dibujo std_srvs/srv/SetBool "{data: false}"
+```
+
+Pausar:
+
+```bash
+ros2 service call /jetbot/pausar_dibujo std_srvs/srv/SetBool "{data: true}"
+```
+
+El reinicio vuelve al primer movimiento desde la posición y orientación
+actuales; no devuelve físicamente el robot al punto de partida.
+
+### Comportamiento
+
+- Velocidad lineal de avance: `0.15 m/s`.
+- Velocidad angular en los giros: `0.8 rad/s`.
+- Los giros están calibrados para realizar aproximadamente 90 grados.
+- El robot se detiene automáticamente si detecta un obstáculo frontal
+  a menos de `0.35 m` mediante el LIDAR.
+- Cuando el obstáculo desaparece, continúa el movimiento desde el paso
+  en el que se encontraba.
+- Al finalizar el recorrido, se detiene y queda pausado.
+
+### Prueba realizada
+
+Se ha comprobado que el robot:
+
+1. Arranca pausado mediante el launch.
+2. Avanza y gira para realizar el recorrido del `0`.
+3. Se detiene ante un obstáculo situado delante.
+4. Continúa la secuencia al retirar el obstáculo.
+5. Se detiene automáticamente al terminar el dibujo.
+
+### Tópicos y servicios del Jetbot
+
+| Elemento | Tipo | Función |
+|---|---|---|
+| `/cmd_vel` | `geometry_msgs/msg/Twist` | Comandos de velocidad del Jetbot |
+| `/scan` | `sensor_msgs/msg/LaserScan` | Lecturas del LIDAR |
+| `/jetbot/pausar_dibujo` | `std_srvs/srv/SetBool` | Pausa o reanuda el dibujo |
+| `/jetbot/reiniciar_dibujo` | `std_srvs/srv/Empty` | Reinicia la secuencia desde la posición actual |
+
 ## Visión — prueba personal de detección ArUco
 
 El script experimental detecta marcadores del diccionario
@@ -351,12 +452,6 @@ Pulsar `q` en la ventana para salir.
 El entorno virtual `.venv-vision` no se incluye en Git. Su configuración
 depende del equipo donde se ejecute.
 
-## Robot real Jetbot
-
-Pendiente de implementar y probar. Los tópicos, tipos de mensaje,
-velocidades y sensores deberán verificarse con el robot real antes
-de reutilizar el código de simulación.
-
 ## Comprobaciones ROS útiles
 
 ```zsh
@@ -376,3 +471,7 @@ entorno virtual local `.venv-vision/`.
 git status
 git log --oneline
 ```
+
+## Autor
+
+Ivan — Grupo 05
